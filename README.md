@@ -78,7 +78,7 @@ Linklabs Rasberry Pi Hat<br />https://www.amazon.co.uk/868-MHz-LoRaWAN-RPi-Shiel
 Rising HF Board<br />http://www.risinghf.com/product/risinghf-iot-dicovery/?lang=en | 26
 IMST backplane or Lite gateway<br />https://wireless-solutions.de/products/long-range-radio/lora_lite_gateway.html | 29 (untested)
 Coredump backplane<br />https://github.com/dbrgn/ic880a-backplane/<br />https://shop.coredump.ch/product/ic880a-lorawan-gateway-backplane/ | 22
-RAK backplane<br /> | 22
+RAK backplane<br /> | 11
 
 
 If you get the message
