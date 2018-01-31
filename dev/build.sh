@@ -70,9 +70,6 @@ else
     cd ..
 fi
 
-apt-get update
-apt-get -y install protobuf-compiler libprotobuf-dev libprotoc-dev automake libtool autoconf python-dev python-rpi.gpio
-
 cd $INSTALL_DIR/dev/lora_gateway/libloragw
 sed -i -e 's/PLATFORM= .*$/PLATFORM= imst_rpi/g' library.cfg
 sed -i -e 's/CFG_SPI= .*$/CFG_SPI= native/g' library.cfg

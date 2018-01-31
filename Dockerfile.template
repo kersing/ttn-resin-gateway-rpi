@@ -1,39 +1,27 @@
 FROM resin/%%RESIN_MACHINE_NAME%%-debian:latest AS buildstep
 
-# versions
-ENV NODE_EXPORTER_VERSION 0.12.0
-ENV RESIN_ARCH %%RESIN_ARCH%%
-ENV RESIN_MACHINE_NAME %%RESIN_MACHINE_NAME%%
-
-# arch
-ENV DIST_ARCH linux-armv7
-
-COPY . /opt/ttn-gateway/
+WORKDIR /opt/ttn-gateway/
+COPY dev dev
 
 # downloading utils
-RUN apt-get update && apt-get install wget build-essential libc6-dev git pkg-config protobuf-compiler libprotobuf-dev libprotoc-dev automake libtool autoconf python-dev python-rpi.gpio
+RUN apt-get update && \
+    apt-get install wget build-essential libc6-dev git pkg-config protobuf-compiler libprotobuf-dev libprotoc-dev automake libtool autoconf python-dev python-rpi.gpio
 
-WORKDIR /opt/ttn-gateway/
-RUN ./dev/build.sh && rm -rf ./dev
+RUN ./dev/build.sh
 
 FROM resin/%%RESIN_MACHINE_NAME%%-debian:latest
-RUN apt-get update && apt-get install python-rpi.gpio && apt-get clean && rm -rf /var/lib/apt/lists/*
-
-# Enable systemd
-ENV INITSYSTEM on
-
-# versions
-ENV NODE_EXPORTER_VERSION 0.12.0
-ENV RESIN_ARCH %%RESIN_ARCH%%
-ENV RESIN_MACHINE_NAME %%RESIN_MACHINE_NAME%%
 
 WORKDIR /opt/ttn-gateway
+
+RUN apt-get update && \
+    apt-get install python-rpi.gpio && \
+    apt-get clean && \
+    rm -rf /var/lib/apt/lists/*
+
 COPY --from=buildstep /opt/ttn-gateway/mp_pkt_fwd .
 COPY --from=buildstep /opt/ttn-gateway/run.py .
 COPY --from=buildstep /usr/local/lib/libpaho-embed-* /usr/lib/
 COPY --from=buildstep /usr/lib/libttn* /usr/lib/
-
-WORKDIR /
 
 COPY start.sh ./
 
