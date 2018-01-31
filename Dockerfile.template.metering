@@ -11,7 +11,20 @@ ENV DIST_ARCH linux-armv7
 COPY . /opt/ttn-gateway/
 
 # downloading utils
-RUN apt-get update && apt-get install wget build-essential libc6-dev git pkg-config protobuf-compiler libprotobuf-dev libprotoc-dev automake libtool autoconf python-dev python-rpi.gpio
+RUN apt-get update && apt-get install wget build-essential libc6-dev git pkg-config
+
+WORKDIR /etc
+
+RUN wget https://github.com/prometheus/node_exporter/releases/download/$NODE_EXPORTER_VERSION/node_exporter-$NODE_EXPORTER_VERSION.$DIST_ARCH.tar.gz  \
+	&& tar xvfz node_exporter-$NODE_EXPORTER_VERSION.$DIST_ARCH.tar.gz \
+	&& rm node_exporter-$NODE_EXPORTER_VERSION.$DIST_ARCH.tar.gz
+
+WORKDIR /opt/gwexporter
+RUN tar xvzf /opt/ttn-gateway/gwexporter.tgz && rm /opt/ttn-gateway/gwexporter.tgz
+RUN wget https://nodejs.org/dist/v8.8.1/node-v8.8.1-linux-armv6l.tar.gz \
+	&& tar xvzf node-v8.8.1-linux-armv6l.tar.gz \
+	&& mv node-v8.8.1-linux-armv6l/* . \
+	&& rm -rf node-v8.8.1-linux-armv6l
 
 WORKDIR /opt/ttn-gateway/
 RUN ./dev/build.sh && rm -rf ./dev
@@ -26,6 +39,12 @@ ENV INITSYSTEM on
 ENV NODE_EXPORTER_VERSION 0.12.0
 ENV RESIN_ARCH %%RESIN_ARCH%%
 ENV RESIN_MACHINE_NAME %%RESIN_MACHINE_NAME%%
+
+WORKDIR /etc
+COPY --from=buildstep /etc/node_exporter-0.12.0.linux-armv7 .
+
+WORKDIR /opt/gwexporter
+COPY --from=buildstep /opt/gwexporter .
 
 WORKDIR /opt/ttn-gateway
 COPY --from=buildstep /opt/ttn-gateway/mp_pkt_fwd .
