@@ -17,7 +17,7 @@ fi
 cd ..
 
 if [ ! -d lora_gateway ]; then
-    git clone -b spi_speed https://github.com/kersing/lora_gateway.git  || { echo 'Cloning lora_gateway failed.' ; exit 1; }
+    git clone https://github.com/kersing/lora_gateway.git  || { echo 'Cloning lora_gateway failed.' ; exit 1; }
 else
     cd lora_gateway
     git reset --hard
@@ -52,9 +52,14 @@ else
     cd ..
 fi
 
-# make sure we get the latest
-rm -rf packet_forwarder
-git clone -b spi_speed https://github.com/kersing/packet_forwarder.git  || { echo 'Cloning packet forwarder failed.' ; exit 1; }
+if [ ! -d packet_forwarder ]; then
+    git clone https://github.com/kersing/packet_forwarder.git  || { echo 'Cloning packet forwarder failed.' ; exit 1; }
+else
+    cd packet_forwarder
+    git reset --hard
+    git pull
+    cd ..
+fi
 
 if [ ! -d protobuf ]; then
     git clone https://github.com/google/protobuf.git  || { echo 'Cloning protobuf failed.' ; exit 1; }
@@ -71,7 +76,6 @@ apt-get -y install protobuf-compiler libprotobuf-dev libprotoc-dev automake libt
 cd $INSTALL_DIR/dev/lora_gateway/libloragw
 sed -i -e 's/PLATFORM= .*$/PLATFORM= imst_rpi/g' library.cfg
 sed -i -e 's/CFG_SPI= .*$/CFG_SPI= native/g' library.cfg
-#sed -i -e 's/DEBUG_GPS= .*$/DEBUG_GPS= 1/g' library.cfg
 make
 
 cd $INSTALL_DIR/dev/protobuf-c
